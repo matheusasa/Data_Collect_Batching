@@ -134,6 +134,6 @@ Abra os notebooks de [`spark_jobs/`](spark_jobs/) ou [`python_native/`](python_n
 
 ## Referências de Arquitetura
 
-- [Spark vs. Python Nativo — Quando usar cada um](spark_jobs/README.md)
-- [Cursores Nativos vs. Pandas em Pipelines de Ingestão](python_native/README.md)
-- [Validação de Infraestrutura Local](teste_service/README.md)
+- [Spark vs. Python Nativo — Quando usar cada um](/workspace/spark_jobs/README.md)
+- [Cursores Nativos vs. Pandas em Pipelines de Ingestão](/workspace/python_native/README.md)
+- [Validação de Infraestrutura Local](/workspace/teste_service/README.md)
