@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  # ============================================================================
+  # 1. PostgreSQL (Banco Transacional OLTP e Relacional)
+  # ============================================================================
+  postgres:
+    image: postgres:15-alpine
+    container_name: dc_postgres
+    environment:
+      POSTGRES_PASSWORD: tailwind2026
+    ports:
+      - "5442:5432" # Porta mapeada para acesso externo via DBeaver
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    restart: always
+
+  # ============================================================================
+  # 2. MinIO (Object Storage / Simulador de AWS S3 para o Data Lake)
+  # ============================================================================
+  minio:
+    image: minio/minio:latest
+    container_name: dc_minio
+    environment:
+      MINIO_ROOT_USER: root-minio
+      MINIO_ROOT_PASSWORD: root12345678
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000" # Porta da API S3 - Usada pelo PySpark
+      - "9001:9001" # Porta do Console Web UI - Acesso pelo Navegador
+    volumes:
+      - minio_data:/data
+    restart: always
+
+  # ============================================================================
+  # 3. Ambiente PySpark + Python (Processamento)
+  # ============================================================================
+  pyspark:
+    image: jupyter/pyspark-notebook:spark-3.5.0
+    container_name: dc_pyspark
+    user: root # Permite instalar pacotes via pip adicionais, se necessário
+    environment:
+      JUPYTER_ENABLE_LAB: "yes"
+      GRANT_SUDO: "yes"
+    # Este comando desativa a exigência de token e senha no Jupyter Lab
+    command: start-notebook.sh --ServerApp.token='' --ServerApp.password=''
+    ports:
+      - "8888:8888" # Interface Web do Jupyter Lab no navegador
+      - "4040:4040" # Spark UI para monitoramento de Jobs
+    volumes:
+      # Ponte/Espelhamento entre sua pasta local e o interior do contêiner
+      - ./workspace:/home/jovyan/work
+    depends_on:
+      - postgres
+      - minio
+
+# Volumes persistentes para armazenamento de dados
+volumes:
+  pg_data:
+  minio_data:
